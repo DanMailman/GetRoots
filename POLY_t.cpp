@@ -4,7 +4,73 @@
 #include "POLY_t.h"
 #include "Utilities.h"
 #define DEBUG
+
+void POLY_t::FindRoots(){
+  /* FindRoots(): Populates POLY Roots Member Set with Real Roots
+	 Method: For Each EPSILON Size Interval {L,R} of <MIN_X, MAX_X>
+	 * Adds {L,R} to ROOTS if F({L,R}) == 0
+	 * Adds (L+R)/2 to ROOTS if F(L),F(R) are on opposite sides of Y=0 
+	 Uses Constants MIN_X, MAX_X, EPSILON
+   */
+  bZero=true;
+  
+  size_t NumIntervals((MAX_X-MIN_X)/EPSILON);
+  for (size_t IntervalNum(0); IntervalNum <= NumIntervals; IntervalNum++){
+	double
+	  L(MIN_X + (IntervalNum * EPSILON)),
+	  R((MIN_X + ((IntervalNum+1) * EPSILON)) > (double)MAX_X
+	  ? (double)MAX_X
+		: (MIN_X + ((IntervalNum+1) * EPSILON))),
+	  FL((*this)(L)),
+	  FR((*this)(R));
+#ifdef xDEBUG
+	cout << "FindRoots(): " 
+		 << "L: F(" << L << "){" << FL << "}" << " "
+		 << "R: F(" << R << "){" << FR << "}" << endl;
+#endif
+	if (FL*FR > (double)0.0) {
+	  bZero=false;
+#ifdef xDEBUG
+	  cout << "REJECT: SAME SIGN: "
+		   << "L: F(" << L << "){" << FL << "}" << " "
+		   << "R: F(" << R << "){" << FR << "}" << endl;
+#endif
+	} else if (FL*FR < (double)0.0) {
+#ifdef xDEBUG
+	  cout << "DIFF SIGN: "
+		   << "L: F(" << L << "){" << FL << "}" << " "
+		   << "R: F(" << R << "){" << FR << "}"
+		   << "Root(" <<  (L+R)/2 << ")" << endl ;
+#endif
+	  ROOTS.insert((L+R)/2);
+	  bZero=false;
+	} else {
+	  if (FL == double(0.0)) {
+#ifdef xDEBUG
+		cout << "F(L)==0: "
+			 << "L: F(" << L << "){" << FL << "}" << " "
+			 << "R: F(" << R << "){" << FR << "}"
+			 << "Root(" << L << ")" << endl ;
+#endif
+		ROOTS.insert(L);
+	  }
+	  if (FR == double(0.0)) {
+#ifdef xDEBUG
+		cout << "F(R)==0: "
+			 << "L: F(" << L << "){" << FL << "}" << " "
+			 << "R: F(" << R << "){" << FR << "}"
+			 << "Root(" << R << ")" << endl ;
+#endif
+		ROOTS.insert(R);
+	  }
+	}
+	//cout << endl;
+  }
+}
+
 string POLY_t::STRING(){
+  /* STRING(): String Representation of Polynomial
+   */
   string ret("F(x)=(");
   vector<double> vCoeff = COEFF ;  
   reverse (vCoeff.begin(),vCoeff.end());
@@ -17,7 +83,9 @@ string POLY_t::STRING(){
 	  if (AbsCoeff != 1){ ret += to_string((size_t)AbsCoeff); }
 	  size_t Degree(vCoeff.size()-iCoeff-1);
 	  if (Degree == 0){
-		;
+		if(AbsCoeff == 1) {
+		  ret+= '1';
+		}
 	  } else {
 		ret+='x';
 		if ((Degree > 1) or (Degree < 0)){
@@ -62,6 +130,10 @@ POLY_t::POLY_t(){
 }
 
 double POLY_t::EVAL(double X){
+  /* EVAL(): Return Value of Polynomial.
+	 Method: Iterate on Accumulation of Product of 
+	         Coefficient With Degree Power of Argument.
+  */
   double fRetSum(0.0);
   for (size_t Degree(0) ; Degree < COEFF.size() ; Degree++){
 #ifdef xDEBUG
@@ -127,6 +199,7 @@ void POLY_t::Plot(){
   gp << "e\n";
 }
 string POLY_t::Roots(){
+  /* Roots(): String Representation of ROOTS  */
   string ret;
   if (bZero){ ret = "<" + STRING() + ">";
   } else {
@@ -147,52 +220,4 @@ bool NearEnough(double fVal1, double fVal2, double fEpsilon){
   /* NearEnough(): Return True if two number approximate  */
   bool RET(abs(fVal1-fVal2) < fEpsilon);
   return RET;
-}
-void POLY_t::FindRoots(){
-  bZero=true;
-  size_t NumIntervals(MAX_X-MIN_X/EPSILON);
-  for (size_t IntervalNum(0); IntervalNum < NumIntervals; IntervalNum++){
-	double
-	  L(MIN_X + (IntervalNum * EPSILON)),
-	  R(L + EPSILON > MAX_X ? MAX_X : L + EPSILON),
-	  FL((*this)(L)),
-	  FR((*this)(R));
-	if (FL*FR > (double)0.0) {
-	  bZero=false;
-#ifdef xDEBUG
-	  cout << "REJECT: SAME SIGN: "
-		   << "L: F(" << L << "){" << FL << "}" << " "
-		   << "R: F(" << R << "){" << FR << "}" << endl;
-#endif
-	} else if (FL*FR < (double)0.0) {
-#ifdef DEBUG
-	  cout << "DIFF SIGN: "
-		   << "L: F(" << L << "){" << FL << "}" << " "
-		   << "R: F(" << R << "){" << FR << "}"
-		   << "Root(" <<  L+R/2 << ")" << endl ;
-#endif
-	  ROOTS.insert(L+R/2);
-	  bZero=false;
-	} else {
-	  if (FL == double(0.0)) {
-#ifdef DEBUG
-		cout << "F(L)==0: "
-			 << "L: F(" << L << "){" << FL << "}" << " "
-			 << "R: F(" << R << "){" << FR << "}"
-			 << "Root(" << L << ")" << endl ;
-#endif
-		ROOTS.insert(L);
-	  }
-	  if (FR == double(0.0)) {
-#ifdef DEBUG
-		cout << "F(R)==0: "
-			 << "L: F(" << L << "){" << FL << "}" << " "
-			 << "R: F(" << R << "){" << FR << "}"
-			 << "Root(" << R << ")" << endl ;
-#endif
-		ROOTS.insert(R);
-	  }
-	}
-	//cout << endl;
-  }
 }

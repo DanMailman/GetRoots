@@ -2,12 +2,12 @@
 #include <iostream>
 #include <vector>    // vector
 #include <set>
-#define MAX_DEGREE   5
-#define MIN_COEFF (-10)
-#define MAX_COEFF   10
-#define MIN_X     (-12)
-#define MAX_X       12
-#define EPSILON  (0.001)
+#define MAX_DEGREE   5  // Highest Degree For Randomly Generated Polynomial
+#define MIN_COEFF (-10) // Minimum for Randomly Generated Integer Coefficients
+#define MAX_COEFF   10  // Mzximum for Randomly Generated Integer Coefficients
+#define MIN_X     (-12) // Minimum For Plot/RootFind Interval
+#define MAX_X       12  // Maximum For Plot/RootFind Interval
+#define EPSILON  (0.1)  // Inverval Size for Plotting/RootFinding
 using namespace std; // vector
 struct POLY_t {
   vector<double> COEFF; // Coefficients: Index is Exponent of X 

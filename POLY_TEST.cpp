@@ -17,9 +17,12 @@ int main(int argc, char *argv[]){
   sigIntHandler.sa_flags = 0;
 
    sigaction(SIGINT, &sigIntHandler, NULL);
+   
    vector < vector<double> >  vvTestData= {
-	 //{0},     // f(x) = 0; No Roots
+	 //{0}     // f(x) = 0; No Roots
+	 //{-1}
 	 //{1},     // f(x) = 1; No Roots
+	 //{2},     // f(x) = 1; No Roots
 	 //{1,0},   // f(x) = x; Root 0
 	 //{1,1},   // f(x) = x+1; Root -1
 	 //{1,0,0}, // f(x) = x²: Roots 0
@@ -32,7 +35,7 @@ int main(int argc, char *argv[]){
 	 // {0,0,1}, // f(x) = 1; No Roots 
 	 // {0,1,0}, // f(x) = x; Root 0
 	 // {0,1,1}, // f(x) = x+1; Root -1
-	 {-1,2,4,7,6,6} // Caught By Epsilon 0.5, Missed By 0.01
+	 {-1,2,4,7,6,6} 
    };
    //Test Known Data
    for  (vector < vector<double> >::iterator iV = vvTestData.begin() ; iV != vvTestData.end(); ++iV){
@@ -40,11 +43,15 @@ int main(int argc, char *argv[]){
 	 POLY_t P(*iV);
 	 POLY_t::test(P);  
    }
+   
    //Test Randomly Generated Data   
-   // do { 
-   // 	 POLY_t P; 
-   // 	 POLY_t::test(P);  
-   // 	 if (PromptContinue((char*)"<ret>Another RANDOM POLY?",(char*)"END POLIES")){ continue ; } else { break ; }	
-   //} while(true);
-   //system("pkill -x gnuplot_qt");
+   do { 
+   	 POLY_t P; 
+   	 POLY_t::test(P);  
+   	 if (PromptContinue((char*)"<ret>Another RANDOM POLY?",
+						(char*)"END POLIES")){
+	   continue ;
+	 } else {
+	   break ; }	
+   } while(true);
 }
